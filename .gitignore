@@ -1,0 +1,10 @@
+.vs/
+*.user
+*.suo
+x64/
+x86/
+Debug/
+Release/
+*.vcxproj.filters
+*.vcxproj.user
+ipch/
