@@ -3,6 +3,8 @@
 #include "PacketTransmitter.h"
 #include "TelemetryReader.h"
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 using namespace std;
 
@@ -12,7 +14,7 @@ int main(int argc, char* argv[]) {
 	ConfigManager config;
 	if (!config.parse(argc, argv)) {
 		
-		cerr << "[ERROR] Usage: Client.exe <ServerIP> <Port> <TelemetryFile> <AirplaceID>" << endl;
+		cerr << "[ERROR] Usage: Client.exe <ServerIP> <Port> <TelemetryFile> <AirplaneID>" << endl;
 		return 1;
 	}
 
@@ -46,6 +48,9 @@ int main(int argc, char* argv[]) {
 			cerr << "Error Lost connection to server." << endl;
 			break;
 		}
+
+		cout << "SENT: " << timestamp << ", Fuel " << fuelRemaining << endl;
+		this_thread::sleep_for(chrono::seconds(1)); //simulate a 1 second delay between packets
 	}
 	cout << "Telemetry transmission completed. EOF reacherd." << endl;
 
