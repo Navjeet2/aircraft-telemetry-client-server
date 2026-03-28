@@ -20,11 +20,11 @@ void handleClient(SOCKET clientSocket) {
         bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
         if (bytesReceived > 0) {
             buffer[bytesReceived] = '\0';
-            std::cout << buffer;
+            //std::cout << buffer;
             TelemetryPacket tp = parser.parse(buffer);
-            std::cout << "ID: " << tp.airplanID << "\n";
-            std::cout << "TS: " << tp.timestamp << "\n";
-            std::cout << "Fuel: " << tp.fuelRemaining << "\n";
+            //std::cout << "ID: " << tp.airplanID << "\n";
+            //std::cout << "TS: " << tp.timestamp << "\n";
+            //std::cout << "Fuel: " << tp.fuelRemaining << "\n";
             airplaneID = tp.airplanID;
             if (prevFuel > -1.0) {
                 double fuelConsumed = fuelCalc.calculate(prevFuel, tp.fuelRemaining);
@@ -36,9 +36,9 @@ void handleClient(SOCKET clientSocket) {
             prevFuel = tp.fuelRemaining;
         }
         else if (bytesReceived == 0) {
-            std::cout << "Client Disconnected\n";
+            std::cout << airplaneID << " Disconnected\n";
             csvWriter.writeResult(airplaneID, totalFuelConsuption);
-            std::cout << "totalFuelConsuption has been written in CSV file.";
+            std::cout << "totalFuelConsuption for " << airplaneID << " has been written in CSV file.\n";
             break;
         }
         else {
@@ -80,6 +80,8 @@ void ConnectionManager::start(int portNumber) {
 
     sockaddr_in clientAddr;
     int clientSize = sizeof(clientAddr);
+    int clientCounter = 0;
+
     while (true) {
         SOCKET clientSocket = accept(serverSocket, (sockaddr*)&clientAddr, &clientSize);
 
@@ -89,6 +91,9 @@ void ConnectionManager::start(int portNumber) {
         }
 
         std::cout << "Connection Established succussfully\n";
+        clientCounter++;
+        std::string assignedID = "PLANE-0" + std::to_string(clientCounter);
+        send(clientSocket, assignedID.c_str(), assignedID.size(), 0);
         std::thread t(handleClient, clientSocket);
         t.detach();
     }
