@@ -2,8 +2,12 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <mutex>
+
+std::mutex CSVWriter::filemutex;
 
 void CSVWriter::writeResult(const std::string& id, double totalFuelCons) {
+	std::lock_guard<std::mutex> lock(filemutex);
 	bool fileExists = std::ifstream("results.csv").good();
 	std::ofstream file("results.csv", std::ios::app);
 	if (!file.is_open()) {

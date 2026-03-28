@@ -135,6 +135,9 @@
     <ClInclude Include="PacketTransmitter.h" />
     <ClInclude Include="TelemetryReader.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="telTestingFile.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
