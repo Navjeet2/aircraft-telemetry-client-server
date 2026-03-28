@@ -12,13 +12,13 @@ int main(int argc, char* argv[]) {
 
 	//Parse config
 	ConfigManager config;
+	cout << "argc: " << argc << endl;
 	if (!config.parse(argc, argv)) {
 		
-		cerr << "[ERROR] Usage: Client.exe <ServerIP> <Port> <TelemetryFile> <AirplaneID>" << endl;
+		cerr << "[ERROR] Usage: Client.exe <ServerIP> <Port> <TelemetryFile>" << endl;
 		return 1;
 	}
 
-	cout << "Airplane ID: " << config.getAirplaneID() << endl;
 	cout << "Server IP: " << config.getServerIP() << endl;
 	cout << "Data File: " << config.getFilePath() << endl;
 
@@ -30,6 +30,18 @@ int main(int argc, char* argv[]) {
 	}
 	cout << "Connected to server successfully." << endl;
 
+	//Receive ID from server
+	char idBuffer[32];
+	int bytes = recv(connection.getSocket(), idBuffer, sizeof(idBuffer), 0);
+	if (bytes <= 0) {
+		cerr << "Failed to receive airplane ID\n";
+		connection.disconnect();
+		return 1;
+	}
+	idBuffer[bytes] = '\0';
+	std::string airplanID = idBuffer;
+	cout << "Airplane ID: " << airplanID << endl;
+
 	//Open telemtry file
 	TelemetryReader reader;
 	if (!reader.openFile(config.getFilePath())) {
@@ -39,7 +51,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	//read-packetize-transmit loop
-	PacketTransmitter transmitter(connection.getSocket(), config.getAirplaneID());
+	PacketTransmitter transmitter(connection.getSocket(), airplanID);
 
 	string timestamp;
 	double fuelRemaining;
