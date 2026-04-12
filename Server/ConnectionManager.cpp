@@ -42,8 +42,9 @@ void handleClient(SOCKET clientSocket) {
             break;
         }
         else {
-            std::cout << "receive Error\n";
-            break;
+            // recv() timed out OR real error
+            std::cout << airplaneID << " connection lost\n";
+            break;  // thread exits, memory released
         }
     }
     closesocket(clientSocket);
@@ -91,12 +92,20 @@ void ConnectionManager::start(int portNumber) {
         }
 
         std::cout << "Connection Established succussfully\n";
+
+        int timeout = 5000; // 5 seconds 
+        setsockopt(clientSocket, SOL_SOCKET, SO_RCVTIMEO,
+            (char*)&timeout, sizeof(timeout));
+
         clientCounter++;
         std::string assignedID = "PLANE-0" + std::to_string(clientCounter);
         send(clientSocket, assignedID.c_str(), assignedID.size(), 0);
+        std::cout << "Server has assigned Id : " << assignedID << "\n";
+        
         std::thread t(handleClient, clientSocket);
         t.detach();
     }
 
     closesocket(serverSocket);
 }
+                                        
