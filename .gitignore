@@ -8,3 +8,5 @@ Release/
 *.vcxproj.filters
 *.vcxproj.user
 ipch/
+Docs
+Server/results.csv
